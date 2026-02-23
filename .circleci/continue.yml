@@ -73,6 +73,5 @@ jobs:
 workflows:
   version: 2
   run-tests:
-    when: << pipeline.parameters.run_pipeline >>
-    jobs:
+     jobs:
       - filtered-tests
