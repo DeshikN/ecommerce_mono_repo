@@ -1,4 +1,4 @@
-import time
+#import time
 import pytest
 import logging
 from services.cart.service import add_item
