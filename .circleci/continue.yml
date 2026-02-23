@@ -1,25 +1,78 @@
 version: 2.1
-
+ 
+parameters:
+  run_pipeline:
+    type: boolean
+    default: false
+ 
 jobs:
-  pytest-runner:
+  filtered-tests:
     docker:
       - image: cimg/python:3.10
+ 
+    working_directory: ~/project
+ 
     steps:
       - checkout
-
+ 
       - run:
-          name: Install dependencies
-          command: pip install -r requirements.txt
-
-      - run:
-          name: Run Tests
+          name: Install Dependencies
           command: |
-            pytest -q --tb=short --disable-warnings --maxfail=1 | tee pytest-summary.log
-
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install pytest
+ 
+      - run:
+          name: Run Filtered Tests (Force Continue Mode)
+          command: |
+            set +e   # 🔥 disable immediate exit on error
+ 
+            mkdir -p test-results
+            EXIT_CODE=0
+ 
+            if [ ! -s filtered_list.txt ]; then
+              echo "filtered_list.txt is empty. Failing build."
+              exit 1
+            fi
+ 
+            echo "Running filtered tests:"
+            cat filtered_list.txt
+            echo "------------------------------------"
+ 
+            while read testfile; do
+              if [ -n "$testfile" ]; then
+                echo ""
+                echo "Running $testfile"
+                echo "------------------------------------"
+ 
+                pytest "$testfile" \
+                  --continue-on-collection-errors \
+                  --junitxml="test-results/$(basename $testfile).xml" \
+                  -v | tee -a test-results/pytest.log
+ 
+                TEST_EXIT=${PIPESTATUS[0]}
+ 
+                if [ $TEST_EXIT -ne 0 ]; then
+                  echo "Test failed in $testfile"
+                  EXIT_CODE=1
+                fi
+              fi
+            done < filtered_list.txt
+ 
+            echo ""
+            echo "Final Exit Code: $EXIT_CODE"
+ 
+            exit $EXIT_CODE
+ 
+      - store_test_results:
+          path: test-results
+ 
       - store_artifacts:
-          path: pytest-summary.log
-
+          path: test-results
+ 
 workflows:
-  test-workflow:
+  version: 2
+  run-tests:
+    when: << pipeline.parameters.run_pipeline >>
     jobs:
-      - pytest-runner
+      - filtered-tests
