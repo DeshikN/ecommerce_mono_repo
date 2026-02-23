@@ -11,7 +11,7 @@ def test_cart_to_checkout_flow():
     logging.info("TestRail ID: 1411 - Cart to checkout integration started")
 
     cart = add_item([], 'apple')
-    assert 1==1
+    assert 1==2
 
     logging.info("TestRail ID: 1411 - Cart to checkout integration completed")
 
