@@ -6,7 +6,7 @@ from services.checkout.service import checkout
 logging.basicConfig(level=logging.INFO)
 
 @pytest.mark.integration
-@pytest.mark.testrail("1410")
+@pytest.mark.testrail("1411")
 def test_cart_to_checkout_flow():
     logging.info("TestRail ID: 1411 - Cart to checkout integration started")
 
