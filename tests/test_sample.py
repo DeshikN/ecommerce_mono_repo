@@ -19,9 +19,9 @@ def test_cart_to_checkout_flow():
 @pytest.mark.integration
 @pytest.mark.testrail("1412")
 def test_checkout_fails_with_empty_cart():
-    logging.info("TestRail ID: 1411 - Checkout with empty cart started")
+    logging.info("TestRail ID: 1412 - Checkout with empty cart started")
 
     cart = []
     assert checkout(cart) is True
 
-    logging.info("TestRail ID: 1411 - Checkout with empty cart completed")
+    logging.info("TestRail ID: 1412 - Checkout with empty cart completed")
