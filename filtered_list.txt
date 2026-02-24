@@ -1,1 +1,2 @@
 tests/integration/test_integration_in/test_code.py
+tests/test_sample.py
