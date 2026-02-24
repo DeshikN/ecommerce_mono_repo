@@ -1,16 +1,41 @@
 version: 2.1
-setup: true
- 
-orbs:
-  path-filtering: circleci/path-filtering@0.1.4
-  continuation: circleci/continuation@0.3.1
- 
+
+jobs:
+  run-tests:
+    docker:
+      - image: cimg/python:3.10
+
+    working_directory: ~/project
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install pytest
+
+      - run:
+          name: Run All Pytest Tests
+          command: |
+            mkdir -p test-results
+
+            pytest \
+              --junitxml=test-results/results.xml \
+              -v | tee test-results/pytest.log
+
+            EXIT_CODE=${PIPESTATUS[0]}
+            exit $EXIT_CODE
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+
 workflows:
-  setup-workflow:
+  run-tests-workflow:
     jobs:
-      - path-filtering/filter:
-          name: check-changes
-          base-revision: main
-          config-path: .circleci/continue.yml
-          mapping: |
-            filtered_list.txt run_pipeline true
+      - run-tests
