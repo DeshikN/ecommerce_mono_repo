@@ -23,12 +23,11 @@ jobs:
             pip install pytest
 
       - run:
-          name: Run Filtered Tests (Corrected)
+          name: Run Filtered Tests
           command: |
             set +e
 
             mkdir -p test-results
-            EXIT_CODE=0
 
             if [ ! -s filtered_list.txt ]; then
               echo "filtered_list.txt is empty. Failing build."
@@ -39,26 +38,13 @@ jobs:
             cat filtered_list.txt
             echo "------------------------------------"
 
-            while read testfile; do
-              if [ -n "$testfile" ]; then
-                echo ""
-                echo "Running $testfile"
-                echo "------------------------------------"
+            # Run pytest once with all filtered files
+            pytest $(cat filtered_list.txt) \
+              --continue-on-collection-errors \
+              --junitxml=test-results/results.xml \
+              -v | tee test-results/pytest.log
 
-                pytest "$testfile" \
-                  -c /dev/null \
-                  --continue-on-collection-errors \
-                  --junitxml="test-results/$(basename $testfile).xml" \
-                  -v | tee -a test-results/pytest.log
-
-                TEST_EXIT=${PIPESTATUS[0]}
-
-                if [ $TEST_EXIT -ne 0 ]; then
-                  echo "Test failed in $testfile"
-                  EXIT_CODE=1
-                fi
-              fi
-            done < filtered_list.txt
+            EXIT_CODE=${PIPESTATUS[0]}
 
             echo ""
             echo "Final Exit Code: $EXIT_CODE"
