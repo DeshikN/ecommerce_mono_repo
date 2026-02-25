@@ -7,32 +7,27 @@ logging.basicConfig(level=logging.INFO)
 
 @pytest.mark.integration
 @pytest.mark.testrail("1411")
-def test_cart_to_checkout_flow_should_fail():
+def test_cart_to_checkout_flow():
     logging.info("TestRail ID: 1411 - Cart to checkout integration started")
 
-    # Add item to cart
     cart = add_item([], 'apple')
-
-    # Intentionally wrong expected result to force failure
-    # Assuming checkout should return True for valid cart
     result = checkout(cart)
 
-    assert result is False, "Expected checkout to fail, but it passed"
+    logging.info("Checkout response received")
+
+    assert result is True, "Checkout should succeed when cart contains items"
 
     logging.info("TestRail ID: 1411 - Cart to checkout integration completed")
 
 
 @pytest.mark.integration
 @pytest.mark.testrail("1412")
-def test_checkout_fails_with_empty_cart_should_fail():
+def test_checkout_fails_with_empty_cart():
     logging.info("TestRail ID: 1412 - Checkout with empty cart started")
 
     cart = []
-
-    # Assuming checkout should return False for empty cart
     result = checkout(cart)
 
-    # Intentionally incorrect assertion to create failure
-    assert result is True, "Expected checkout to pass, but it failed"
+    assert result is False, "Checkout should fail for empty cart"
 
     logging.info("TestRail ID: 1412 - Checkout with empty cart completed")
