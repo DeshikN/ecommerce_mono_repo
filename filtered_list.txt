@@ -1,4 +1,2 @@
 tests/e2e/test_user_checkout.py
 tests/integration/test_cart_checkout_flow.py
-tests/integration/test_integration_in/test_code.py
-tests/test_sample.py
